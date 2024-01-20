@@ -1,0 +1,46 @@
+Start testing: Jan 15 19:07 -03
+----------------------------------------------------------
+1/1 Testing: Google_Tests
+1/1 Test: Google_Tests
+Command: "/Users/nickplace/CLionProjects/my_key_value_db/build/Google_tests/Google_Tests_run"
+Directory: /Users/nickplace/CLionProjects/my_key_value_db/build
+"Google_Tests" start time: Jan 15 19:07 -03
+Output:
+----------------------------------------------------------
+Running main() from /Users/nickplace/CLionProjects/my_key_value_db/Google_tests/lib/googletest/googletest/src/gtest_main.cc
+[==========] Running 2 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from SimpleTest
+[ RUN      ] SimpleTest.Equality
+[       OK ] SimpleTest.Equality (0 ms)
+[----------] 1 test from SimpleTest (0 ms total)
+
+[----------] 1 test from DBCoreTest
+[ RUN      ] DBCoreTest.createDB
+/Users/nickplace/CLionProjects/my_key_value_db/Google_tests/test1.cpp:29: Failure
+Value of: fs::is_directory(fs::status(directory))
+  Actual: false
+Expected: true
+
+unknown file: Failure
+C++ exception with description "filesystem error: in directory_iterator::directory_iterator(...): No such file or directory [""]" thrown in the test body.
+
+[  FAILED  ] DBCoreTest.createDB (0 ms)
+[----------] 1 test from DBCoreTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 1 test.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] DBCoreTest.createDB
+
+ 1 FAILED TEST
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"Google_Tests" end time: Jan 15 19:07 -03
+"Google_Tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 15 19:07 -03
