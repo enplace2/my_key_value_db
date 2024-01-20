@@ -13,11 +13,13 @@ bool FSManager::createBaseDirectory() {
     return fs::exists(FSManager::baseDir);
 }
 
-bool FSManager::createDBDirectory(std::string &dbName) {
+std::string FSManager::createDBDirectory(std::string &dbName) {
     std::string dbDirectoryPath = FSManager::baseDir + "/" +dbName;
 
     if(!fs::exists(dbDirectoryPath)){
-        return fs::create_directory(dbDirectoryPath);
+        fs::create_directory(dbDirectoryPath);
+        if(!fs::exists(dbDirectoryPath)) return "";
+        return dbDirectoryPath;
     }
-    return fs::exists(dbDirectoryPath);
+    return dbDirectoryPath;
 }

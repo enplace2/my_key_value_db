@@ -15,9 +15,10 @@ KVDatabase::~KVDatabase()  = default;
 
 KVDatabase KVDatabase::createEmptyDb(std::string &dbName) {
 
-    return KVDatabase{dbName, dbName};
+    std::string directoryPath = FSManager::createDBDirectory(dbName);
+    return KVDatabase(dbName, directoryPath);
 }
 
-std::string KVDatabase::getDirectory(void) {
-    return std::string();
+std::string KVDatabase::getDirectory() {
+    return this->fullPath;
 }

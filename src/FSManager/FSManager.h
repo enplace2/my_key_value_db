@@ -9,19 +9,20 @@
 
 class FSManager {
 private:
+
+public:
     static std::string getHomeDir() {
         char* homeDir;
-        #ifdef _WIN32
-            homeDir = getenv("USERPROFILE");
-        #else
-            homeDir = getenv("HOME");
-        #endif
+#ifdef _WIN32
+        homeDir = getenv("USERPROFILE");
+#else
+        homeDir = getenv("HOME");
+#endif
 
         return std::string(homeDir);
     }
-public:
     static bool createBaseDirectory();
-    static bool createDBDirectory(std::string &dbName);
+    static std::string createDBDirectory(std::string &dbName);
     inline static const std::string baseDir = getHomeDir() + "/.kv_db";
 
 };

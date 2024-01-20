@@ -28,19 +28,18 @@ TEST(FSManagerTest, createDBDirectory){
         */
 
     std::string testDbName = "test_db";
-    bool dbDirectoryExists = FSManager::createDBDirectory(testDbName);
-    EXPECT_TRUE(dbDirectoryExists);
+    std::string directoryPath = FSManager::createDBDirectory(testDbName);
+    EXPECT_TRUE(fs::is_directory(fs::status(directoryPath)));
 }
 
-TEST(DBCoreTest, createDB){
+TEST(DBCoreTest, createEmptyDB){
     /* Story
      * [Who] As a software engineer,
      * [What] I need to create a new db
      * [Value] So I can store and retrieve data
      */
 
-
-    std::string dbName = "testDb";
+    std::string dbName = "test_db_2";
     KVDatabase db = KVDatabase::createEmptyDb(dbName);
     std::string directory = db.getDirectory();
     // We know that it is successful when:
