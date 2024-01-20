@@ -8,19 +8,28 @@
 #include "../src/FSManager/FSManager.h"
 
 namespace fs = std::filesystem;
-// A simple test: Test equality of two values
-TEST(SimpleTest, Equality) {
-EXPECT_EQ(1, 1);
-}
 
-TEST(FSManagerTest, createBaseDir){
+TEST(FSManagerTest, createBaseDirectory){
     /* Story
         * [Who] As a software engineer,
-        * [What] I need to create the base directory for the db
+        * [What] I need to create the base directory for the program
         * [Value] So I can store databases and other related files
         */
     bool baseDirExists = FSManager::createBaseDirectory();
     EXPECT_TRUE(baseDirExists);
+}
+
+
+TEST(FSManagerTest, createDBDirectory){
+    /* Story
+        * [Who] As a software engineer,
+        * [What] I need to create a directory for a given database
+        * [Value] So I can store and retrieve database files
+        */
+
+    std::string testDbName = "test_db";
+    bool dbDirectoryExists = FSManager::createDBDirectory(testDbName);
+    EXPECT_TRUE(dbDirectoryExists);
 }
 
 TEST(DBCoreTest, createDB){

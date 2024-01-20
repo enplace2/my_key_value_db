@@ -21,6 +21,7 @@ private:
     }
 public:
     static bool createBaseDirectory();
+    static bool createDBDirectory(std::string &dbName);
     inline static const std::string baseDir = getHomeDir() + "/.kv_db";
 
 };

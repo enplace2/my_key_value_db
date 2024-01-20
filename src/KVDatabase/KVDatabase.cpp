@@ -3,6 +3,7 @@
 //
 
 #include "KVDatabase.h"
+#include "../FSManager/FSManager.h"
 
 
 KVDatabase::KVDatabase(const std::string& dbName, const std::string& fullPath) {
@@ -13,7 +14,6 @@ KVDatabase::KVDatabase(const std::string& dbName, const std::string& fullPath) {
 KVDatabase::~KVDatabase()  = default;
 
 KVDatabase KVDatabase::createEmptyDb(std::string &dbName) {
-    std::string baseDir = "my_kv_db";
 
     return KVDatabase{dbName, dbName};
 }
