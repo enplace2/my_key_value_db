@@ -21,7 +21,7 @@ public:
     std::string getPath() const {
         return this->fullPath;
     };
-    std::string getDirectory(void);
+    std::string getDirectory();
 };
 
 

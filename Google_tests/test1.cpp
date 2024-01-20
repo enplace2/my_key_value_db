@@ -5,11 +5,22 @@
 #include <filesystem>
 #include <string>
 #include "../src/KVDatabase/KVDatabase.h"
+#include "../src/FSManager/FSManager.h"
 
 namespace fs = std::filesystem;
 // A simple test: Test equality of two values
 TEST(SimpleTest, Equality) {
 EXPECT_EQ(1, 1);
+}
+
+TEST(FSManagerTest, createBaseDir){
+    /* Story
+        * [Who] As a software engineer,
+        * [What] I need to create the base directory for the db
+        * [Value] So I can store databases and other related files
+        */
+    bool baseDirExists = FSManager::createBaseDirectory();
+    EXPECT_TRUE(baseDirExists);
 }
 
 TEST(DBCoreTest, createDB){

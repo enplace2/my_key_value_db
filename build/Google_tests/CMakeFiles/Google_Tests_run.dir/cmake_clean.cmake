@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Google_Tests_run.dir/__/src/FSManager/FSManager.cpp.o"
+  "CMakeFiles/Google_Tests_run.dir/__/src/FSManager/FSManager.cpp.o.d"
   "CMakeFiles/Google_Tests_run.dir/__/src/KVDatabase/KVDatabase.cpp.o"
   "CMakeFiles/Google_Tests_run.dir/__/src/KVDatabase/KVDatabase.cpp.o.d"
   "CMakeFiles/Google_Tests_run.dir/test1.cpp.o"

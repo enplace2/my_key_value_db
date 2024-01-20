@@ -273,6 +273,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/my_key_value_db.dir/build.make CMakeFiles/my_key_value_db.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/FSManager/FSManager.o: src/FSManager/FSManager.cpp.o
+.PHONY : src/FSManager/FSManager.o
+
+# target to build an object file
+src/FSManager/FSManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/my_key_value_db.dir/build.make CMakeFiles/my_key_value_db.dir/src/FSManager/FSManager.cpp.o
+.PHONY : src/FSManager/FSManager.cpp.o
+
+src/FSManager/FSManager.i: src/FSManager/FSManager.cpp.i
+.PHONY : src/FSManager/FSManager.i
+
+# target to preprocess a source file
+src/FSManager/FSManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/my_key_value_db.dir/build.make CMakeFiles/my_key_value_db.dir/src/FSManager/FSManager.cpp.i
+.PHONY : src/FSManager/FSManager.cpp.i
+
+src/FSManager/FSManager.s: src/FSManager/FSManager.cpp.s
+.PHONY : src/FSManager/FSManager.s
+
+# target to generate assembly for a file
+src/FSManager/FSManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/my_key_value_db.dir/build.make CMakeFiles/my_key_value_db.dir/src/FSManager/FSManager.cpp.s
+.PHONY : src/FSManager/FSManager.cpp.s
+
 src/KVDatabase/KVDatabase.o: src/KVDatabase/KVDatabase.cpp.o
 .PHONY : src/KVDatabase/KVDatabase.o
 
@@ -319,6 +343,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/FSManager/FSManager.o"
+	@echo "... src/FSManager/FSManager.i"
+	@echo "... src/FSManager/FSManager.s"
 	@echo "... src/KVDatabase/KVDatabase.o"
 	@echo "... src/KVDatabase/KVDatabase.i"
 	@echo "... src/KVDatabase/KVDatabase.s"

@@ -10,5 +10,7 @@ include_directories(lib/googletest/googletest/include)
 add_executable(Google_Tests_run test1.cpp
         ../src/KVDatabase/KVDatabase.h
         ../src/KVDatabase/KVDatabase.cpp
+        ../src/FSManager/FSManager.cpp
+        ../src/FSManager/FSManager.h
 )
 target_link_libraries(Google_Tests_run gtest gtest_main)

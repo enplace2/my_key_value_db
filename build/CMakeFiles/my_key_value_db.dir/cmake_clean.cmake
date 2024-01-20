@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/my_key_value_db.dir/main.cpp.o"
   "CMakeFiles/my_key_value_db.dir/main.cpp.o.d"
+  "CMakeFiles/my_key_value_db.dir/src/FSManager/FSManager.cpp.o"
+  "CMakeFiles/my_key_value_db.dir/src/FSManager/FSManager.cpp.o.d"
   "CMakeFiles/my_key_value_db.dir/src/KVDatabase/KVDatabase.cpp.o"
   "CMakeFiles/my_key_value_db.dir/src/KVDatabase/KVDatabase.cpp.o.d"
   "my_key_value_db"

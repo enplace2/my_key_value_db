@@ -185,6 +185,30 @@ Google_Tests_run/fast:
 	cd /Users/nickplace/CLionProjects/my_key_value_db/build && $(MAKE) $(MAKESILENT) -f Google_tests/CMakeFiles/Google_Tests_run.dir/build.make Google_tests/CMakeFiles/Google_Tests_run.dir/build
 .PHONY : Google_Tests_run/fast
 
+__/src/FSManager/FSManager.o: __/src/FSManager/FSManager.cpp.o
+.PHONY : __/src/FSManager/FSManager.o
+
+# target to build an object file
+__/src/FSManager/FSManager.cpp.o:
+	cd /Users/nickplace/CLionProjects/my_key_value_db/build && $(MAKE) $(MAKESILENT) -f Google_tests/CMakeFiles/Google_Tests_run.dir/build.make Google_tests/CMakeFiles/Google_Tests_run.dir/__/src/FSManager/FSManager.cpp.o
+.PHONY : __/src/FSManager/FSManager.cpp.o
+
+__/src/FSManager/FSManager.i: __/src/FSManager/FSManager.cpp.i
+.PHONY : __/src/FSManager/FSManager.i
+
+# target to preprocess a source file
+__/src/FSManager/FSManager.cpp.i:
+	cd /Users/nickplace/CLionProjects/my_key_value_db/build && $(MAKE) $(MAKESILENT) -f Google_tests/CMakeFiles/Google_Tests_run.dir/build.make Google_tests/CMakeFiles/Google_Tests_run.dir/__/src/FSManager/FSManager.cpp.i
+.PHONY : __/src/FSManager/FSManager.cpp.i
+
+__/src/FSManager/FSManager.s: __/src/FSManager/FSManager.cpp.s
+.PHONY : __/src/FSManager/FSManager.s
+
+# target to generate assembly for a file
+__/src/FSManager/FSManager.cpp.s:
+	cd /Users/nickplace/CLionProjects/my_key_value_db/build && $(MAKE) $(MAKESILENT) -f Google_tests/CMakeFiles/Google_Tests_run.dir/build.make Google_tests/CMakeFiles/Google_Tests_run.dir/__/src/FSManager/FSManager.cpp.s
+.PHONY : __/src/FSManager/FSManager.cpp.s
+
 __/src/KVDatabase/KVDatabase.o: __/src/KVDatabase/KVDatabase.cpp.o
 .PHONY : __/src/KVDatabase/KVDatabase.o
 
@@ -247,6 +271,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... Google_Tests_run"
+	@echo "... __/src/FSManager/FSManager.o"
+	@echo "... __/src/FSManager/FSManager.i"
+	@echo "... __/src/FSManager/FSManager.s"
 	@echo "... __/src/KVDatabase/KVDatabase.o"
 	@echo "... __/src/KVDatabase/KVDatabase.i"
 	@echo "... __/src/KVDatabase/KVDatabase.s"
