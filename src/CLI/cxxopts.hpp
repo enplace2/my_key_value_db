@@ -125,9 +125,9 @@ namespace cxxopts {
             CXXOPTS__VERSION_MINOR,
             CXXOPTS__VERSION_PATCH
     };
-} // namespace cxxopts
+} // namespace CLI
 
-//when we ask cxxopts to use Unicode, help strings are processed using ICU,
+//when we ask CLI to use Unicode, help strings are processed using ICU,
 //which results in the correct lengths being computed for strings when they
 //are formatted for the help output
 //it is necessary to make sure that <unicode/unistr.h> can be found by the
@@ -136,7 +136,7 @@ namespace cxxopts {
 #ifdef CXXOPTS_USE_UNICODE
 #include <unicode/unistr.h>
 
-namespace cxxopts {
+namespace CLI {
 
 using String = icu::UnicodeString;
 
@@ -148,7 +148,7 @@ toLocalString(std::string s)
 }
 
 // GNU GCC with -Weffc++ will issue a warning regarding the upcoming class, we want to silence it:
-// warning: base class 'class std::enable_shared_from_this<cxxopts::Value>' has accessible non-virtual destructor
+// warning: base class 'class std::enable_shared_from_this<CLI::Value>' has accessible non-virtual destructor
 CXXOPTS_DIAGNOSTIC_PUSH
 CXXOPTS_IGNORE_WARNING("-Wnon-virtual-dtor")
 // This will be ignored under other compilers like LLVM clang.
@@ -261,22 +261,22 @@ empty(const String& s)
   return s.isEmpty();
 }
 
-} // namespace cxxopts
+} // namespace CLI
 
 namespace std {
 
 inline
-cxxopts::UnicodeStringIterator
+CLI::UnicodeStringIterator
 begin(const icu::UnicodeString& s)
 {
-  return cxxopts::UnicodeStringIterator(&s, 0);
+  return CLI::UnicodeStringIterator(&s, 0);
 }
 
 inline
-cxxopts::UnicodeStringIterator
+CLI::UnicodeStringIterator
 end(const icu::UnicodeString& s)
 {
-  return cxxopts::UnicodeStringIterator(&s, s.length());
+  return CLI::UnicodeStringIterator(&s, s.length());
 }
 
 } // namespace std
@@ -337,7 +337,7 @@ namespace cxxopts {
         return s.empty();
     }
 
-} // namespace cxxopts
+} // namespace CLI
 
 //ifdef CXXOPTS_USE_UNICODE
 #endif
@@ -351,7 +351,7 @@ namespace cxxopts {
 
 // GNU GCC with -Weffc++ will issue a warning regarding the upcoming class, we
 // want to silence it: warning: base class 'class
-// std::enable_shared_from_this<cxxopts::Value>' has accessible non-virtual
+// std::enable_shared_from_this<CLI::Value>' has accessible non-virtual
 // destructor This will be ignored under other compilers like LLVM clang.
     CXXOPTS_DIAGNOSTIC_PUSH
     CXXOPTS_IGNORE_WARNING("-Wnon-virtual-dtor")
@@ -2859,6 +2859,6 @@ CXXOPTS_IGNORE_WARNING("-Wnull-dereference")
         return m_help.at(group);
     }
 
-} // namespace cxxopts
+} // namespace CLI
 
 #endif //CXXOPTS_HPP_INCLUDED

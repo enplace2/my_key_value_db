@@ -8,7 +8,9 @@ add_executable(my_key_value_db main.cpp
         src/KVDatabase/KVDatabase.h
         src/FSManager/FSManager.cpp
         src/FSManager/FSManager.h
-        src/cxxopts/cxxopts.hpp)
+        src/CLI/cxxopts.hpp
+        src/CLI/KVCli.cpp
+        src/CLI/KVCli.h)
 
 add_subdirectory(Google_tests)
 enable_testing()
