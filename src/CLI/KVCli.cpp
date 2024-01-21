@@ -22,7 +22,16 @@ int KVCli::handle(int argc, char* argv[]) {
 
     auto result = options.parse(argc, argv);
     if(result.count("n") !=1){
-        std::cout << "You must provide a database name with -n <name>";
+        std::cout << "You must provide a database name with -n <name>" << std::endl;
+        return 1;
+    }
+    std::size_t cCount = result.count("c");
+    std::size_t dCount = result.count("d");
+    std::size_t sCount = result.count("s");
+    std::size_t gCount = result.count("g");
+
+    if((cCount + dCount + sCount + gCount) >1){
+        std::cout << "Method conflict: only one of get, store, destroy, create can be called at the same time" << std::endl;
         return 1;
     }
     if(result.count("c")==1){
@@ -36,7 +45,7 @@ int KVCli::handle(int argc, char* argv[]) {
     }
      if(result.count("s")==1){
          if(result.count("k") !=1 || result.count("v")!=1){
-             std::cout << "You must provide a key and a value to store";
+             std::cout << "You must provide a key and a value to store" << std::endl;
              return 1;
          }
          std::string dbName = result["n"].as<std::string>();
@@ -47,7 +56,7 @@ int KVCli::handle(int argc, char* argv[]) {
     }
      if(result.count("g")==1){
          if(result.count("k") !=1){
-             std::cout << "You must provide a key and a key to retrieve";
+             std::cout << "You must provide a key and a key to retrieve" << std::endl;
              return 1;
          }
          std::string dbName = result["n"].as<std::string>();
