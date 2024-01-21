@@ -23,3 +23,9 @@ std::string FSManager::createDBDirectory(std::string &dbName) {
     }
     return dbDirectoryPath;
 }
+
+std::ofstream FSManager::openDBWriteStream(std::string &directoryPath, std::string &key) {
+    std::ofstream os;
+    os.open(directoryPath + "/" + key + "_string.kv");
+    return os;
+}
