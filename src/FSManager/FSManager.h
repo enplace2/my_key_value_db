@@ -28,6 +28,7 @@ public:
     static std::string createDBDirectory(std::string &dbName);
     static std::ofstream openDBWriteStream(std::string &directoryPath, std::string &key);
     static std::string readFileContents(std::string &filePath);
+    static std::string getDbPath(std::string &dbName);
 };
 
 

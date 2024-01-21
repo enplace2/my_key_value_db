@@ -16,7 +16,7 @@ bool FSManager::createBaseDirectory() {
 }
 
 std::string FSManager::createDBDirectory(std::string &dbName) {
-    std::string dbDirectoryPath = FSManager::baseDir + "/" +dbName;
+    std::string dbDirectoryPath = getDbPath(dbName);
 
     if(!fs::exists(dbDirectoryPath)){
         fs::create_directory(dbDirectoryPath);
@@ -39,4 +39,9 @@ std::string FSManager::readFileContents(std::string &filePath) {
         return content;
     }
     return "";
+}
+
+std::string FSManager::getDbPath(std::string &dbName) {
+    std::string dbDirectoryPath = FSManager::baseDir + "/" +dbName;
+    return dbDirectoryPath;
 }

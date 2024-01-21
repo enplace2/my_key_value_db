@@ -32,6 +32,7 @@ public:
      * ---------------------------------------*/
     static KVDatabase createEmptyDb(std::string& dbName);
     void destroy();
+    static KVDatabase load(std::string &dbName);
 
 
     std::string store(std::string &key, std::string &value);

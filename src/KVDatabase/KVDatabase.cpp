@@ -48,3 +48,8 @@ std::string KVDatabase::getFilePath(std::string &key) {
     return this->fullPath + "/" + key + "_string.kv";
 }
 
+KVDatabase KVDatabase::load(std::string &dbName) {
+    std::string dbDirectoryPath = FSManager::getDbPath(dbName);
+    return KVDatabase(dbName, dbDirectoryPath);
+}
+

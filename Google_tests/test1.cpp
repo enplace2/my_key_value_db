@@ -77,7 +77,8 @@ TEST(DBCoreTest, storeAndRetrieveValues){
     //1. we can write to the database, and then show that retrieving the value
     // returns the same value that we wrote to the db
     std::string dbName = "test_db";
-    KVDatabase db = KVDatabase::createEmptyDb(dbName);
+    KVDatabase emptyDb = KVDatabase::createEmptyDb(dbName);
+    KVDatabase db = KVDatabase::load(dbName);
     std::string key = "some_key";
     std::string value = "some_value";
     db.store(key, value);
