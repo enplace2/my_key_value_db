@@ -1,9 +1,12 @@
 #include <iostream>
 #include "src/FSManager/FSManager.h"
+#include "src/CLI/KVCli.h"
+using namespace std;
 
-int main() {
-    std::cout << "Hello, World!" << std::endl;
+
+int main(int argc, char* argv[]) {
     bool baseDirectoryExists = FSManager::createBaseDirectory();
     if(!baseDirectoryExists) return 1;
-    return 0;
+
+    return KVCli::handle(argc, argv);
 }
