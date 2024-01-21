@@ -36,7 +36,7 @@ public:
 
     std::string store(std::string &key, std::string &value);
     std::string get(std::string &key);
-    std::ofstream dBWriteStream(std::string &dbName);
+    std::string getFilePath(std::string &key);
 };
 
 

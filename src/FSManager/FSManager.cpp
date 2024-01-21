@@ -4,6 +4,8 @@
 
 #include "FSManager.h"
 #include <filesystem>
+#include <fstream>
+#include <string>
 namespace fs = std::filesystem;
 
 bool FSManager::createBaseDirectory() {
@@ -28,4 +30,13 @@ std::ofstream FSManager::openDBWriteStream(std::string &directoryPath, std::stri
     std::ofstream os;
     os.open(directoryPath + "/" + key + "_string.kv");
     return os;
+}
+
+std::string FSManager::readFileContents(std::string &filePath) {
+    std::ifstream is(filePath);
+    if(is){
+        std::string content((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+        return content;
+    }
+    return "";
 }

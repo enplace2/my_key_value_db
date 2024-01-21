@@ -7,7 +7,8 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
-
+#include <iostream>
+#include <sstream>
 class FSManager {
 private:
 
@@ -26,9 +27,7 @@ public:
     static bool createBaseDirectory();
     static std::string createDBDirectory(std::string &dbName);
     static std::ofstream openDBWriteStream(std::string &directoryPath, std::string &key);
-
-
-
+    static std::string readFileContents(std::string &filePath);
 };
 
 

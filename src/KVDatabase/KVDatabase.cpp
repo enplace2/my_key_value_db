@@ -39,6 +39,12 @@ std::string KVDatabase::store(std::string &key, std::string &value) {
 }
 
 std::string KVDatabase::get(std::string &key){
-    return "Hello";
+    std::string filePath = getFilePath(key);
+    std::string value = FSManager::readFileContents(filePath);
+    return value;
+}
+
+std::string KVDatabase::getFilePath(std::string &key) {
+    return this->fullPath + "/" + key + "_string.kv";
 }
 

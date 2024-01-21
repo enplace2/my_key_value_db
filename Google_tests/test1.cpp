@@ -59,7 +59,8 @@ TEST(DBCoreTest, createEmptyDB){
    * [What] I need to destroy a database
    * [Value] So I can manage my db system appropriately
    */
-    // we know that it is successful when:
+
+    //We know that it is successful when:
     //1. the db directory no longer exists
     db.destroy();
     EXPECT_FALSE(fs::exists(directory));
@@ -72,13 +73,16 @@ TEST(DBCoreTest, storeAndRetrieveValues){
      * [Value] So that data can persist and be used at a later time
      */
 
+    //We know that it is successful when:
+    //1. we can write to the database, and then show that retrieving the value
+    // returns the same value that we wrote to the db
     std::string dbName = "test_db";
     KVDatabase db = KVDatabase::createEmptyDb(dbName);
     std::string key = "some_key";
     std::string value = "some_value";
     db.store(key, value);
 
-    //std::string dbValue = db.get(key);
-    EXPECT_TRUE(true);
-
+    std::string dbValue = db.get(key);
+    EXPECT_EQ(dbValue, value);
+    db.destroy();
 }
