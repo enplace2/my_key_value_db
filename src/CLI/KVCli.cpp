@@ -52,7 +52,8 @@ int KVCli::handle(int argc, char* argv[]) {
          std::string key = result["k"].as<std::string>();
          std::string value = result["v"].as<std::string>();
          KVDatabase db = KVDatabase::load(dbName);
-         db.store(key, value);
+         std::string test = "test";
+         db.store(key, value, test);
     }
      if(result.count("g")==1){
          if(result.count("k") !=1){

@@ -29,6 +29,8 @@ public:
     static std::ofstream openDBWriteStream(std::string &directoryPath, std::string &key);
     static std::string readFileContents(std::string &filePath);
     static std::string getDbPath(std::string &dbName);
+    static std::string getDbStoreFilePath(std::string &dbName);
+    static void appendTimeStampToFileName(std::string &originalPath);
 };
 
 

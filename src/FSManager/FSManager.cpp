@@ -45,3 +45,22 @@ std::string FSManager::getDbPath(std::string &dbName) {
     std::string dbDirectoryPath = FSManager::baseDir + "/" +dbName;
     return dbDirectoryPath;
 }
+
+std::string FSManager::getDbStoreFilePath(std::string &dbName) {
+    std::string dbStoreFilePath = getDbPath(dbName) + "/" +"store.kv";
+    return dbStoreFilePath;
+}
+
+void FSManager::appendTimeStampToFileName(std::string &originalPath) {
+    if (std::filesystem::exists(originalPath)) {
+        auto now = std::chrono::system_clock::now();
+        auto now_c = std::chrono::system_clock::to_time_t(now);
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&now_c), "%Y%m%d%H%M%S");
+
+        std::filesystem::path pathObj(originalPath);
+        std::string newName = pathObj.parent_path().string() + "/" + pathObj.stem().string() + "_" + ss.str() + pathObj.extension().string();
+
+        std::filesystem::rename(originalPath, newName); // Rename the file
+    }
+}

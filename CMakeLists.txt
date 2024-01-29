@@ -10,9 +10,12 @@ add_executable(my_key_value_db main.cpp
         src/FSManager/FSManager.h
         src/CLI/cxxopts.hpp
         src/CLI/KVCli.cpp
-        src/CLI/KVCli.h)
-
+        src/CLI/KVCli.h
+        src/variants/ValueTypeVariant.h
+        src/structs/ValueWithTypeObject.h
+)
 add_subdirectory(Google_tests)
 enable_testing()
 
 add_test(NAME Google_Tests COMMAND Google_Tests_run)
+

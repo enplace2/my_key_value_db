@@ -81,7 +81,8 @@ TEST(DBCoreTest, storeAndRetrieveValues){
     KVDatabase db = KVDatabase::load(dbName);
     std::string key = "some_key";
     std::string value = "some_value";
-    db.store(key, value);
+    std::string test = "test";
+    db.store(key, value, test);
 
     std::string dbValue = db.get(key);
     EXPECT_EQ(dbValue, value);

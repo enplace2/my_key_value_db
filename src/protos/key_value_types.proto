@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package mykeyvalue;
+
+message KeyValue {
+    string key = 1;
+    oneof value {
+        string string_value = 2;
+        int32 int_value = 3;
+        bool bool_value = 4;
+        double double_value = 5;
+        uint32 uint_value = 6;
+    }
+}
+
+message KeyValueMap {
+    repeated KeyValue items = 1;
+}
