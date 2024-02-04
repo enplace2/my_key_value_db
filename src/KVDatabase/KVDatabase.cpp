@@ -4,6 +4,7 @@
 
 #include "KVDatabase.h"
 #include "../FSManager/FSManager.h"
+#include "../protos/generated/KeyValueTypes/key_value_types.pb.h"
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -58,7 +59,7 @@ void KVDatabase::saveToDisk() {
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
     //if a store file already exists, version it by appending a timestamp
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
-
+    keyvaluetypes::KeyValueMap kvMap;
     //@TODO: should delete versions regularly after some time period
 
 
