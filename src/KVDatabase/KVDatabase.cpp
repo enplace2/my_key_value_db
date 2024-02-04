@@ -12,9 +12,12 @@
 
 namespace fs = std::filesystem;
 
-KVDatabase::KVDatabase(const std::string& dbName, const std::string& directoryPath) {
+KVDatabase::KVDatabase(std::string &dbName) {
+    std::string dbDirectoryPath = FSManager::getDbPath(dbName);
+    std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
     this->name = dbName;
-    this->directoryPath = directoryPath;
+    this->directoryPath = dbDirectoryPath;
+    this->storeFilePath = dbStoreFilePath;
 }
 
 KVDatabase::~KVDatabase()  = default;
@@ -23,8 +26,9 @@ std::string KVDatabase::getDirectory() {
     return this->directoryPath;
 }
 KVDatabase KVDatabase::createEmptyDb(std::string &dbName) {
-    std::string directoryPath = FSManager::createDBDirectory(dbName);
-    return KVDatabase(dbName, directoryPath);
+    std::string directoryPath = FSManager::createDbDirectory(dbName);
+    std::string dbStoreFile = FSManager::createDbStoreFile(dbName);
+    return KVDatabase(dbName);
 }
 
 void KVDatabase::destroy() {
@@ -53,7 +57,7 @@ std::string KVDatabase::getFilePath(std::string &key) {
 
 KVDatabase KVDatabase::load(std::string &dbName) {
     std::string dbDirectoryPath = FSManager::getDbPath(dbName);
-    return KVDatabase(dbName, dbDirectoryPath);
+    return KVDatabase(dbName);
 }
 
 
@@ -63,16 +67,37 @@ void KVDatabase::saveToDisk() {
     //if a store file already exists, version it by appending a timestamp
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
     keyvaluetypes::KeyValueMap kvMap;
-    //@TODO: should delete versions regularly after some time period
 
+    //iterate through this->hashmap
+    for(const auto &item : this->hashMap){
+        // each hashmap item has a type that corresponds to one of the keyvaluetypes::KeyValue types.
+        // add those to the kvMap
+        const auto key = item.first;
+        const auto [value, type] = item.second;
+        keyvaluetypes::KeyValue* kv = kvMap.add_items();
+        kv->set_key(key);
+        if(type == "string"){
+           std::string castValue = std::get<std::string>(value);
+            kv->set_string_value(castValue);
+        }else if (type =="int"){
+            int castValue = std::get<int>(value);
+            kv->set_int_value(castValue);
+        }else if (type =="bool"){
+            bool castValue = std::get<bool>(value);
+            kv->set_bool_value(castValue);
+        }else if (type =="double"){
+            double castValue = std::get<bool>(value);
+            kv->set_double_value(castValue);
+        }else if (type =="uint"){
+            uint castValue = std::get<uint>(value);
+            kv->set_uint_value(castValue);
+        }
+    }
 
-
-    // write the new file to disk
-    //delete previous file?w
-
-
-
-    //check if file exists
-    //if so, append a timestamp to the name, before the extension
+    // write the serialized data to a file at dbStoreFilePath
+    std::string serializedData;
+    kvMap.SerializeToString(&serializedData);
+    std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
+    outputFile.write(serializedData.data(), serializedData.size());
 
 }

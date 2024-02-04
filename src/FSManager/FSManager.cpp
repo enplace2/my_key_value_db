@@ -15,7 +15,7 @@ bool FSManager::createBaseDirectory() {
     return fs::exists(FSManager::baseDir);
 }
 
-std::string FSManager::createDBDirectory(std::string &dbName) {
+std::string FSManager::createDbDirectory(std::string &dbName) {
     std::string dbDirectoryPath = getDbPath(dbName);
 
     if(!fs::exists(dbDirectoryPath)){
@@ -26,9 +26,25 @@ std::string FSManager::createDBDirectory(std::string &dbName) {
     return dbDirectoryPath;
 }
 
-std::ofstream FSManager::openDBWriteStream(std::string &directoryPath, std::string &key) {
+std::string FSManager::createDbStoreFile(std::string &dbName) {
+    std::string dbStoreFilePath = getDbStoreFilePath(dbName);
+
+    // Open and immediately close an ofstream with the path.
+    // This creates an empty file.
+    std::ofstream file(dbStoreFilePath);
+
+    if (!file) {
+        std::cerr << "Failed to create file at: " << dbStoreFilePath << std::endl;
+    }
+
+    // Return the file path
+    return dbStoreFilePath;
+}
+
+
+std::ofstream FSManager::openDBWriteStream(std::string &filePath) {
     std::ofstream os;
-    os.open(directoryPath + "/" + key + "_string.kv");
+    os.open(filePath);
     return os;
 }
 

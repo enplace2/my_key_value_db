@@ -20,8 +20,9 @@ private:
     std::string name;
     std::string directoryPath;
     std::unordered_map<std::string, ValueWithTypeObject> hashMap;
+    std::string storeFilePath;
 public:
-    KVDatabase(const std::string& dbName, const std::string& directoryPath);
+    KVDatabase(std::string &dbName);
     ~KVDatabase();
 
     /*-----------------------------------------

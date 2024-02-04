@@ -20,7 +20,7 @@ TEST(FSManagerTest, createBaseDirectory){
 }
 
 
-TEST(FSManagerTest, createDBDirectory){
+TEST(FSManagerTest, createDbDirectory){
     /* Story
         * [Who] As a software engineer,
         * [What] I need to create a directory for a given database
@@ -28,8 +28,10 @@ TEST(FSManagerTest, createDBDirectory){
         */
 
     std::string testDbName = "test_db";
-    std::string directoryPath = FSManager::createDBDirectory(testDbName);
+    std::string directoryPath = FSManager::createDbDirectory(testDbName);
+    std::string storeFilePath = FSManager::createDbStoreFile(testDbName);
     EXPECT_TRUE(fs::is_directory(fs::status(directoryPath)));
+    EXPECT_TRUE(fs::is_regular_file(storeFilePath));
 }
 
 TEST(DBCoreTest, createEmptyDB){
