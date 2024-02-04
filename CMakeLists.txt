@@ -41,6 +41,10 @@ protobuf_generate(TARGET my_key_value_db LANGUAGE cpp PROTOS ${PROTO_FILES})
 # After protobuf_generate command
 target_include_directories(my_key_value_db PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/protos)
 
+add_subdirectory(Google_tests)
+enable_testing()
+
+add_test(NAME Google_Tests COMMAND Google_Tests_run)
 # Link with the Protobuf library
 target_link_libraries(my_key_value_db protobuf::libprotobuf)
 
