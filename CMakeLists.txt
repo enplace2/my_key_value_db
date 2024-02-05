@@ -24,7 +24,7 @@ add_executable(my_key_value_db
 # Find the Protobuf package
 find_package(protobuf REQUIRED CONFIG)
 
-# Include the CMake binary directory
+# Include the CMake binary directory for accessing generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Specify where the protobuf files are
