@@ -4,13 +4,22 @@ package keyvaluetypes;
 
 message KeyValue {
     string key = 1;
-    oneof value {
-        string string_value = 2;
-        int64 int_value = 3;
-        bool bool_value = 4;
-        double double_value = 5;
-        uint64 uint_value = 6;
+    Value value = 2;
+}
+
+message Value{
+    oneof type {
+        string string_value = 1;
+        int64 int_value = 2;
+        bool bool_value = 3;
+        double double_value = 4;
+        uint64 uint_value = 5;
+        Map map = 6;
     }
+};
+
+message Map {
+    map<string, Value> fields = 1;
 }
 
 message KeyValueMap {

@@ -76,23 +76,27 @@ void KVDatabase::saveToDisk() {
         const auto key = item.first;
         const auto [value, type] = item.second;
         keyvaluetypes::KeyValue* kv = kvMap.add_items();
+        keyvaluetypes::Value* val = new keyvaluetypes::Value();
+
         kv->set_key(key);
         if(type == "string"){
            std::string castValue = std::get<std::string>(value);
-            kv->set_string_value(castValue);
+            val->set_string_value(castValue);
         }else if (type =="int"){
             int64_t castValue = std::get<int64_t>(value);
-            kv->set_int_value(castValue);
+            val->set_int_value(castValue);
         }else if (type =="bool"){
             bool castValue = std::get<bool>(value);
-            kv->set_bool_value(castValue);
+            val->set_bool_value(castValue);
         }else if (type =="double"){
             double castValue = std::get<double>(value);
-            kv->set_double_value(castValue);
+            val->set_double_value(castValue);
         }else if (type =="uint"){
             uint64_t castValue = std::get<uint64_t>(value);
-            kv->set_uint_value(castValue);
+            val->set_uint_value(castValue);
         }
+
+        kv->set_allocated_value(val);
     }
 
     // write the serialized data to a file at dbStoreFilePath
@@ -121,23 +125,24 @@ void KVDatabase::loadStoreFileIntoHashmap() {
 
     for (const auto& item : kvMap.items()) {
         const auto& key = item.key();
+        const auto& val = item.value();
         ValueTypeVariant value;
         std::string type;
 
-        if (item.has_string_value()) {
-            value = item.string_value();
+        if (val.has_string_value()) {
+            value = val.string_value();
             type = "string";
-        } else if (item.has_int_value()) {
-            value = item.int_value();
+        } else if (val.has_int_value()) {
+            value = val.int_value();
             type = "int";
-        } else if (item.has_bool_value()) {
-            value = item.bool_value();
+        } else if (val.has_bool_value()) {
+            value = val.bool_value();
             type = "bool";
-        } else if (item.has_double_value()) {
-            value = item.double_value();
+        } else if (val.has_double_value()) {
+            value = val.double_value();
             type = "double";
-        } else if (item.has_uint_value()) {
-            value = item.uint_value();
+        } else if (val.has_uint_value()) {
+            value = val.uint_value();
             type = "uint";
         }
 
