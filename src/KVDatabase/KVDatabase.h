@@ -7,14 +7,22 @@
 #include <string>
 #include <any>
 #include <fstream>
+#include "../variants/ValueTypeVariant.h"
+#include "../structs/ValueWithTypeObject.h"
+
+// Now you can use KeyValueVariant here
+
+
 
 
 class KVDatabase {
 private:
     std::string name;
-    std::string fullPath;
+    std::string directoryPath;
+    std::unordered_map<std::string, ValueWithTypeObject> hashMap;
+    std::string storeFilePath;
 public:
-    KVDatabase(const std::string& dbName, const std::string& fullPath);
+    KVDatabase(std::string &dbName);
     ~KVDatabase();
 
     /*-----------------------------------------
@@ -24,7 +32,7 @@ public:
         return this->name;
     }
     std::string getPath() const {
-        return this->fullPath;
+        return this->directoryPath;
     };
     std::string getDirectory();
     /*-----------------------------------------
@@ -33,11 +41,14 @@ public:
     static KVDatabase createEmptyDb(std::string& dbName);
     void destroy();
     static KVDatabase load(std::string &dbName);
+    void loadStoreFileIntoHashmap();
 
 
-    std::string store(std::string &key, std::string &value);
-    std::string get(std::string &key);
+    ValueTypeVariant store(std::string &key, const ValueTypeVariant &value, std::string &type);
+    ValueTypeVariant get(std::string &key);
     std::string getFilePath(std::string &key);
+
+    void saveToDisk();
 };
 
 
