@@ -11,4 +11,4 @@
 #include <variant>
 #include <string>
 
-using ValueTypeVariant = std::variant<std::string, int, bool, double, uint64_t>;
+using ValueTypeVariant = std::variant<std::string, int64_t, bool, double, uint64_t>;

@@ -121,21 +121,21 @@ TEST(DBCoreTest, storeAndRetrieveValues){
 
     /** Type Int (positive) **/
     std::string intKey = "int_key";
-    int intValue = 5987987;
+    int64_t intValue = 5987987;
     std::string intType = "int";
     db.store(intKey, intValue, intType);
 
     ValueTypeVariant pIntVal = db.get(intKey);
-    int castPIntVal = std::get<int>(pIntVal);
+    int64_t castPIntVal = std::get<int64_t>(pIntVal);
     EXPECT_EQ(castPIntVal, intValue);
 
     /** Type Int (negative) **/
     std::string negativeKey = "negative_int_key";
-    int negativeIntValue = -54218;
+    int64_t negativeIntValue = -54218;
     db.store(negativeKey, negativeIntValue, intType);
 
     ValueTypeVariant nIntVal = db.get(negativeKey);
-    int castNIntVal = std::get<int>(nIntVal);
+    int64_t castNIntVal = std::get<int64_t>(nIntVal);
     EXPECT_EQ(castNIntVal, negativeIntValue);
 
     /** Type bool (true) **/
@@ -201,13 +201,13 @@ TEST(DBCoreTest, storeAndRetrieveValues){
 
     /** Type Int (positive) **/
     ValueTypeVariant loadInt = loadedDb.get(intKey);
-    int castLoadInt = std::get<int>(loadInt);
+    int64_t castLoadInt = std::get<int64_t>(loadInt);
     EXPECT_EQ(castLoadInt, intValue);
 
     /** Type Int (negative) **/
 
     ValueTypeVariant loadNInt = loadedDb.get(negativeKey);
-    int castLoadNInt = std::get<int>(loadNInt);
+    int64_t castLoadNInt = std::get<int64_t>(loadNInt);
     EXPECT_EQ(castLoadNInt, negativeIntValue);
 
 

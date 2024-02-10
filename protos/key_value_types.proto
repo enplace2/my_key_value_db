@@ -6,7 +6,7 @@ message KeyValue {
     string key = 1;
     oneof value {
         string string_value = 2;
-        int32 int_value = 3;
+        int64 int_value = 3;
         bool bool_value = 4;
         double double_value = 5;
         uint64 uint_value = 6;
