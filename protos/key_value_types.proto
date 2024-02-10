@@ -9,7 +9,7 @@ message KeyValue {
         int32 int_value = 3;
         bool bool_value = 4;
         double double_value = 5;
-        uint32 uint_value = 6;
+        uint64 uint_value = 6;
     }
 }
 

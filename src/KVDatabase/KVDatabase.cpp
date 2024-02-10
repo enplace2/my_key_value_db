@@ -87,10 +87,10 @@ void KVDatabase::saveToDisk() {
             bool castValue = std::get<bool>(value);
             kv->set_bool_value(castValue);
         }else if (type =="double"){
-            double castValue = std::get<bool>(value);
+            double castValue = std::get<double>(value);
             kv->set_double_value(castValue);
         }else if (type =="uint"){
-            uint castValue = std::get<uint>(value);
+            uint64_t castValue = std::get<uint64_t>(value);
             kv->set_uint_value(castValue);
         }
     }
