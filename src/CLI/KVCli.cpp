@@ -63,8 +63,9 @@ int KVCli::handle(int argc, char* argv[]) {
          std::string dbName = result["n"].as<std::string>();
          std::string key = result["k"].as<std::string>();
          KVDatabase db = KVDatabase::load(dbName);
-         std::string value = db.get(key);
-         std::cout << value << std::endl;
+         ValueTypeVariant value = db.get(key);
+         //std::string valueString = std::get<std::string>(value);
+         //std::cout << valueString << std::endl;
     }
 
     return 0;

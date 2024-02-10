@@ -14,10 +14,11 @@ namespace fs = std::filesystem;
 
 KVDatabase::KVDatabase(std::string &dbName) {
     std::string dbDirectoryPath = FSManager::getDbPath(dbName);
-    std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
+    std::string dbStoreFilePath = FSManager::getDbStoreFilePath(dbName);
     this->name = dbName;
     this->directoryPath = dbDirectoryPath;
     this->storeFilePath = dbStoreFilePath;
+    loadStoreFileIntoHashmap();
 }
 
 KVDatabase::~KVDatabase()  = default;
@@ -25,7 +26,7 @@ KVDatabase::~KVDatabase()  = default;
 std::string KVDatabase::getDirectory() {
     return this->directoryPath;
 }
-KVDatabase KVDatabase::createEmptyDb(std::string &dbName) {
+KVDatabase KVDatabase:: createEmptyDb(std::string &dbName) {
     std::string directoryPath = FSManager::createDbDirectory(dbName);
     std::string dbStoreFile = FSManager::createDbStoreFile(dbName);
     return KVDatabase(dbName);
@@ -45,9 +46,9 @@ ValueTypeVariant KVDatabase::store(std::string &key, const ValueTypeVariant &val
     return savedValue;
 }
 
-std::string KVDatabase::get(std::string &key){
+ValueTypeVariant KVDatabase::get(std::string &key){
     std::string filePath = getFilePath(key);
-    std::string value = FSManager::readFileContents(filePath);
+    const auto [value, type] = this->hashMap[key];
     return value;
 }
 
@@ -100,4 +101,46 @@ void KVDatabase::saveToDisk() {
     std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
     outputFile.write(serializedData.data(), serializedData.size());
 
+}
+
+void KVDatabase::loadStoreFileIntoHashmap() {
+    std::ifstream inputFile(this->storeFilePath, std::ios::binary);
+
+    if (!inputFile) {
+        throw std::runtime_error("Error opening file for reading.");
+    }
+
+    std::string serializedData((std::istreambuf_iterator<char>(inputFile)),
+                               std::istreambuf_iterator<char>());
+
+    keyvaluetypes::KeyValueMap kvMap;
+    if (!kvMap.ParseFromString(serializedData)) {
+        // Handle error: parsing failed
+        throw std::runtime_error("Error parsing file content.");
+    }
+
+    for (const auto& item : kvMap.items()) {
+        const auto& key = item.key();
+        ValueTypeVariant value;
+        std::string type;
+
+        if (item.has_string_value()) {
+            value = item.string_value();
+            type = "string";
+        } else if (item.has_int_value()) {
+            value = item.int_value();
+            type = "int";
+        } else if (item.has_bool_value()) {
+            value = item.bool_value();
+            type = "bool";
+        } else if (item.has_double_value()) {
+            value = item.double_value();
+            type = "double";
+        } else if (item.has_uint_value()) {
+            value = item.uint_value();
+            type = "uint";
+        }
+
+        this->hashMap[key] = {value, type};
+    }
 }

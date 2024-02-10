@@ -41,10 +41,11 @@ public:
     static KVDatabase createEmptyDb(std::string& dbName);
     void destroy();
     static KVDatabase load(std::string &dbName);
+    void loadStoreFileIntoHashmap();
 
 
     ValueTypeVariant store(std::string &key, const ValueTypeVariant &value, std::string &type);
-    std::string get(std::string &key);
+    ValueTypeVariant get(std::string &key);
     std::string getFilePath(std::string &key);
 
     void saveToDisk();
