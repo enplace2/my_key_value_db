@@ -1,3 +1,4 @@
+/*
 //
 // Created by Nick Place on 1/28/24.
 //
@@ -10,5 +11,7 @@
 // KeyValueVariant.h
 #include <variant>
 #include <string>
+#include "../structs/ValueWithTypeObject.h"
 
-using ValueTypeVariant = std::variant<std::string, int64_t, bool, double, uint64_t>;
+using ValueTypeVariant = std::variant<std::string, int64_t, bool, double, uint64_t, ValueWithTypeObject>;
+*/

@@ -63,45 +63,73 @@ KVDatabase KVDatabase::load(std::string &dbName) {
 
 
 void KVDatabase::saveToDisk() {
-    //get the file path to save to
+    // Get the file path to save to.
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
-    //if a store file already exists, version it by appending a timestamp
+    // If a store file already exists, version it by appending a timestamp.
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
-    keyvaluetypes::KeyValueMap kvMap;
+
+    // Use the modified generateProtobufKVMap to get a pointer to the map.
+    keyvaluetypes::KeyValueMap* kvMap = generateProtobufKVMap(this->hashMap);
+
+    // Write the serialized data to a file at dbStoreFilePath.
+    std::string serializedData;
+    kvMap->SerializeToString(&serializedData);
+    std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
+    if (outputFile.is_open()) {
+        outputFile.write(serializedData.data(), serializedData.size());
+    }
+
+    // Free memory
+    delete kvMap;
+}
+
+
+keyvaluetypes::KeyValueMap* KVDatabase::generateProtobufKVMap(const KVMap &hashMap){
+    keyvaluetypes::KeyValueMap* kvMap = new keyvaluetypes::KeyValueMap();
 
     //iterate through this->hashmap
-    for(const auto &item : this->hashMap){
+    for(const auto &item : hashMap){
         // each hashmap item has a type that corresponds to one of the keyvaluetypes::KeyValue types.
         // add those to the kvMap
         const auto key = item.first;
         const auto [value, type] = item.second;
-        keyvaluetypes::KeyValue* kv = kvMap.add_items();
+        keyvaluetypes::KeyValue* kv = kvMap->add_items();
         kv->set_key(key);
-        if(type == "string"){
-           std::string castValue = std::get<std::string>(value);
-            kv->set_string_value(castValue);
-        }else if (type =="int"){
-            int64_t castValue = std::get<int64_t>(value);
-            kv->set_int_value(castValue);
-        }else if (type =="bool"){
-            bool castValue = std::get<bool>(value);
-            kv->set_bool_value(castValue);
-        }else if (type =="double"){
-            double castValue = std::get<double>(value);
-            kv->set_double_value(castValue);
-        }else if (type =="uint"){
-            uint64_t castValue = std::get<uint64_t>(value);
-            kv->set_uint_value(castValue);
-        }
+        keyvaluetypes::Value* val = serializeValue(value, type);
+        kv->set_allocated_value(val);
     }
+    return kvMap;
+};
 
-    // write the serialized data to a file at dbStoreFilePath
-    std::string serializedData;
-    kvMap.SerializeToString(&serializedData);
-    std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
-    outputFile.write(serializedData.data(), serializedData.size());
+// Correct the function signature to return a pointer and accept const parameters
+keyvaluetypes::Value* KVDatabase::serializeValue(const ValueTypeVariant &value, const std::string &type){
+    keyvaluetypes::Value* val = new keyvaluetypes::Value();
 
+    if(type == "string"){
+        std::string castValue = std::get<std::string>(value);
+        val->set_string_value(castValue);
+    }else if (type =="int"){
+        int64_t castValue = std::get<int64_t>(value);
+        val->set_int_value(castValue);
+    }else if (type =="bool"){
+        bool castValue = std::get<bool>(value);
+        val->set_bool_value(castValue);
+    }else if (type =="double"){
+        double castValue = std::get<double>(value);
+        val->set_double_value(castValue);
+    }else if (type =="uint"){
+        uint64_t castValue = std::get<uint64_t>(value);
+        val->set_uint_value(castValue);
+    }else if (type == "map"){
+        KVMap castValue = std::get<KVMap>(value);
+        //convert to pointer in this case and pass ownership to protobuf library
+        keyvaluetypes::KeyValueMap* nestedKVMap = generateProtobufKVMap(castValue);
+
+        val->set_allocated_map(nestedKVMap);
+    }
+    return val;
 }
+
 
 void KVDatabase::loadStoreFileIntoHashmap() {
     std::ifstream inputFile(this->storeFilePath, std::ios::binary);
@@ -121,23 +149,24 @@ void KVDatabase::loadStoreFileIntoHashmap() {
 
     for (const auto& item : kvMap.items()) {
         const auto& key = item.key();
+        const auto& val = item.value();
         ValueTypeVariant value;
         std::string type;
 
-        if (item.has_string_value()) {
-            value = item.string_value();
+        if (val.has_string_value()) {
+            value = val.string_value();
             type = "string";
-        } else if (item.has_int_value()) {
-            value = item.int_value();
+        } else if (val.has_int_value()) {
+            value = val.int_value();
             type = "int";
-        } else if (item.has_bool_value()) {
-            value = item.bool_value();
+        } else if (val.has_bool_value()) {
+            value = val.bool_value();
             type = "bool";
-        } else if (item.has_double_value()) {
-            value = item.double_value();
+        } else if (val.has_double_value()) {
+            value = val.double_value();
             type = "double";
-        } else if (item.has_uint_value()) {
-            value = item.uint_value();
+        } else if (val.has_uint_value()) {
+            value = val.uint_value();
             type = "uint";
         }
 
