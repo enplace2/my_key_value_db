@@ -287,3 +287,62 @@ TEST(DBCoreTest, StoreAndRetrieveNestedKVMaps) {
 
     db.destroy();
 }
+
+TEST(DBCoreTest, StoreAndRetrieveDeeplyNestedKVMaps) {
+    /** Story
+     * [Who] As a user,
+     * [What] I need to store and retrieve deeply nested key-value maps
+     * [Value] So that very complex data structures can be persisted and utilized.
+     */
+
+    /** Setup **/
+    std::string dbName = "deeply_nested_kv_map_db";
+    KVDatabase db = KVDatabase::createEmptyDb(dbName);
+
+    // Define deeply nested KV map
+    KVMap innermostMap;
+    innermostMap["deepest_string_key"] = {"deepest_string_value", "string"};
+    innermostMap["deepest_int_key"] = {42, "int"};
+
+    KVMap nestedMap;
+    nestedMap["inner_string_key"] = {"inner_string_value", "string"};
+    nestedMap["inner_int_key"] = {123, "int"};
+    nestedMap["inner_nested_map"] = {innermostMap, "map"}; // Third level of nesting
+
+    KVMap outerMap;
+    outerMap["nested_map_key"] = {nestedMap, "map"};
+
+    // Store the deeply nested KV map in the database
+    std::string mapKey = "outer_map_key";
+    std::string type = "map";
+    db.store(mapKey, outerMap, type);
+
+    /** Test Retrieval **/
+    // Retrieve the stored deeply nested KV map
+    ValueTypeVariant retrievedValueVariant = db.get(mapKey);
+    auto retrievedMap = std::get<KVMap>(retrievedValueVariant);
+
+    // Verify the nested structure
+    ASSERT_TRUE(retrievedMap.find("nested_map_key") != retrievedMap.end());
+    auto innerMapVariant = retrievedMap["nested_map_key"];
+    auto retrievedInnerMap = std::get<KVMap>(innerMapVariant.value);
+
+    // Verify contents of the nested map
+    ASSERT_TRUE(retrievedInnerMap.find("inner_nested_map") != retrievedInnerMap.end());
+    auto retrievedInnermostMapVariant = retrievedInnerMap["inner_nested_map"];
+    auto retrievedInnermostMap = std::get<KVMap>(retrievedInnermostMapVariant.value);
+
+    // Verify contents of the innermost map
+    ASSERT_TRUE(retrievedInnermostMap.find("deepest_string_key") != retrievedInnermostMap.end());
+    auto retrievedDeepestStringValueVariant = retrievedInnermostMap["deepest_string_key"];
+    std::string retrievedDeepestStringValue = std::get<std::string>(retrievedDeepestStringValueVariant.value);
+    EXPECT_EQ(retrievedDeepestStringValue, "deepest_string_value");
+
+    ASSERT_TRUE(retrievedInnermostMap.find("deepest_int_key") != retrievedInnermostMap.end());
+    auto retrievedDeepestIntValueVariant = retrievedInnermostMap["deepest_int_key"];
+    int64_t retrievedDeepestIntValue = std::get<int64_t>(retrievedDeepestIntValueVariant.value);
+    EXPECT_EQ(retrievedDeepestIntValue, 42);
+
+    db.destroy();
+}
+
