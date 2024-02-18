@@ -12,7 +12,7 @@ add_executable(my_key_value_db
         src/CLI/cxxopts.hpp
         src/CLI/KVCli.cpp
         src/CLI/KVCli.h
-        src/variants/ValueTypeVariant.h
+        #src/variants/ValueTypeVariant.h
         src/structs/ValueWithTypeObject.h
 )
 

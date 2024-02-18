@@ -188,6 +188,15 @@ TEST(DBCoreTest, storeAndRetrieveValues){
     uint64_t castUint = std::get<uint64_t>(uintdbVal);
     EXPECT_EQ(castUint, uintVal);
 
+    /** Type KeyValue Map **/
+/*    std::unordered_map<std::string, ValueWithTypeObject> nestedMap;
+    std::string nestedKey =  "nested_key";
+    std::string mapType = "map";
+    nestedMap[stringKey] =  {value, type};
+    nestedMap[intKey] = {intValue, intType};
+    nestedMap[uintKey] = {uintVal, uintType};
+
+    db.store(nestedKey, nestedMap, mapType);*/
 
     /***********************************************************************
      * 2. We can load that database and retrieve the saved value
@@ -238,5 +247,5 @@ TEST(DBCoreTest, storeAndRetrieveValues){
     EXPECT_EQ(castLoadUint , uintVal);
 
 
-    //db.destroy();
+    db.destroy();
 }

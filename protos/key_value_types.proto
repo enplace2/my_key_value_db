@@ -14,13 +14,10 @@ message Value{
         bool bool_value = 3;
         double double_value = 4;
         uint64 uint_value = 5;
-        Map map = 6;
+        KeyValueMap map = 6;
     }
 };
 
-message Map {
-    map<string, Value> fields = 1;
-}
 
 message KeyValueMap {
     repeated KeyValue items = 1;
