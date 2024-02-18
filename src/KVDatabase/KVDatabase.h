@@ -50,7 +50,7 @@ public:
     std::string getFilePath(std::string &key);
 
     void saveToDisk();
-    static keyvaluetypes::KeyValueMap generateProtobufKVMap(const KVMap &hashMap);
+    static keyvaluetypes::KeyValueMap* generateProtobufKVMap(const KVMap &hashMap);
     static keyvaluetypes::Value* serializeValue(const ValueTypeVariant &value, const std::string &type);
 };
 

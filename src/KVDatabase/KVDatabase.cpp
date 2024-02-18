@@ -63,21 +63,29 @@ KVDatabase KVDatabase::load(std::string &dbName) {
 
 
 void KVDatabase::saveToDisk() {
-    //get the file path to save to
+    // Get the file path to save to.
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
-    //if a store file already exists, version it by appending a timestamp
+    // If a store file already exists, version it by appending a timestamp.
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
-    keyvaluetypes::KeyValueMap kvMap = generateProtobufKVMap(this->hashMap);
-    // write the serialized data to a file at dbStoreFilePath
-    std::string serializedData;
-    kvMap.SerializeToString(&serializedData);
-    std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
-    outputFile.write(serializedData.data(), serializedData.size());
 
+    // Use the modified generateProtobufKVMap to get a pointer to the map.
+    keyvaluetypes::KeyValueMap* kvMap = generateProtobufKVMap(this->hashMap);
+
+    // Write the serialized data to a file at dbStoreFilePath.
+    std::string serializedData;
+    kvMap->SerializeToString(&serializedData);
+    std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
+    if (outputFile.is_open()) {
+        outputFile.write(serializedData.data(), serializedData.size());
+    }
+
+    // Free memory
+    delete kvMap;
 }
 
-keyvaluetypes::KeyValueMap KVDatabase::generateProtobufKVMap(const KVMap &hashMap){
-    keyvaluetypes::KeyValueMap kvMap;
+
+keyvaluetypes::KeyValueMap* KVDatabase::generateProtobufKVMap(const KVMap &hashMap){
+    keyvaluetypes::KeyValueMap* kvMap = new keyvaluetypes::KeyValueMap();
 
     //iterate through this->hashmap
     for(const auto &item : hashMap){
@@ -85,7 +93,7 @@ keyvaluetypes::KeyValueMap KVDatabase::generateProtobufKVMap(const KVMap &hashMa
         // add those to the kvMap
         const auto key = item.first;
         const auto [value, type] = item.second;
-        keyvaluetypes::KeyValue* kv = kvMap.add_items();
+        keyvaluetypes::KeyValue* kv = kvMap->add_items();
         kv->set_key(key);
         keyvaluetypes::Value* val = serializeValue(value, type);
         kv->set_allocated_value(val);
@@ -114,7 +122,9 @@ keyvaluetypes::Value* KVDatabase::serializeValue(const ValueTypeVariant &value, 
         val->set_uint_value(castValue);
     }else if (type == "map"){
         KVMap castValue = std::get<KVMap>(value);
-        keyvaluetypes::KeyValueMap nestedKVMap = generateProtobufKVMap(castValue);
+        //convert to pointer in this case and pass ownership to protobuf library
+        keyvaluetypes::KeyValueMap* nestedKVMap = generateProtobufKVMap(castValue);
+
         val->set_allocated_map(nestedKVMap);
     }
     return val;
