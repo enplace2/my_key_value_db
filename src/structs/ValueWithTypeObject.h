@@ -13,7 +13,7 @@ struct ValueWithTypeObject;
 
 using KVMap = std::unordered_map<std::string, ValueWithTypeObject>;
 
-//note recursive reference to ValueWithTypeObject. This enables nested objects to be stored
+//recursive reference to ValueWithTypeObject enables nested objects to be stored
 using ValueTypeVariant = std::variant<std::string, int64_t, bool, double, uint64_t, KVMap>;
 
 struct ValueWithTypeObject {
