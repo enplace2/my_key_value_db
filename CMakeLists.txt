@@ -14,6 +14,7 @@ add_executable(my_key_value_db
         src/CLI/KVCli.h
         #src/variants/ValueTypeVariant.h
         src/structs/ValueWithTypeObject.h
+        src/Parsers/JSONParser/Enums/TokenType.h
 )
 
 
