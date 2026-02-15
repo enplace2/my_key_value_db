@@ -11,6 +11,17 @@ namespace fs = std::filesystem;
 
 class NestedMapTest : public ::testing::Test {
 protected:
+    std::vector<std::string> testDatabases;
+
+    void TearDown() override {
+        for (const auto& dbName : testDatabases) {
+            std::string dbPath = FSManager::getDbPath(const_cast<std::string&>(dbName));
+            if (fs::exists(dbPath)) {
+                fs::remove_all(dbPath);
+            }
+        }
+    }
+
     KVMap extractNestedMap(const KVMap& parentMap, const std::string& key) {
         EXPECT_TRUE(parentMap.find(key) != parentMap.end());
         return std::get<KVMap>(parentMap.at(key).value);
@@ -38,6 +49,7 @@ protected:
         std::string dbName = dbNameParam;
         std::string key = keyParam;
         std::string type = "map";
+        testDatabases.push_back(dbName);
         {
             KVDatabase db = KVDatabase::createEmptyDb(dbName);
             db.store(key, mapToStore, type);

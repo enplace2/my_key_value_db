@@ -63,24 +63,17 @@ KVDatabase KVDatabase::load(std::string &dbName) {
 
 
 void KVDatabase::saveToDisk() {
-    // Get the file path to save to.
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
-    // If a store file already exists, version it by appending a timestamp.
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
 
-    // Use the modified generateProtobufKVMap to get a pointer to the map.
-    keyvaluetypes::KeyValueMap* kvMap = generateProtobufKVMap(this->hashMap);
+    std::unique_ptr<keyvaluetypes::KeyValueMap> kvMap(generateProtobufKVMap(this->hashMap));
 
-    // Write the serialized data to a file at dbStoreFilePath.
     std::string serializedData;
     kvMap->SerializeToString(&serializedData);
     std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
     if (outputFile.is_open()) {
         outputFile.write(serializedData.data(), serializedData.size());
     }
-
-    // Free memory
-    delete kvMap;
 }
 
 
@@ -130,9 +123,12 @@ keyvaluetypes::Value* KVDatabase::serializeValue(const ValueTypeVariant &value, 
     return val;
 }
 
-// Recursively deserializes a Protocol Buffer KeyValueMap into a C++ KVMap
-// Handles all value types including nested maps
-KVMap KVDatabase::loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap) {
+KVMap KVDatabase::loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap, int depth) {
+    const int MAX_DEPTH = 100;
+    if (depth > MAX_DEPTH) {
+        throw std::runtime_error("Maximum nesting depth exceeded (limit: " + std::to_string(MAX_DEPTH) + ")");
+    }
+
     KVMap resultMap;
 
     for (const auto& item : protoMap.items()) {
@@ -157,13 +153,10 @@ KVMap KVDatabase::loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap) {
             value = val.uint_value();
             type = "uint";
         } else if (val.has_map()) {
-            // Recursive call for nested maps
-            value = loadNestedMap(val.map());
+            value = loadNestedMap(val.map(), depth + 1);
             type = "map";
         } else {
-            // Unknown type - log error and skip this entry
-            std::cerr << "Warning: Unknown value type for key '" << key << "'" << std::endl;
-            continue;
+            throw std::runtime_error("Unknown value type for key '" + key + "'");
         }
 
         resultMap[key] = {value, type};
