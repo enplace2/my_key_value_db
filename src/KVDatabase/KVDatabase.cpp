@@ -70,9 +70,15 @@ void KVDatabase::saveToDisk() {
 
     std::string serializedData;
     kvMap->SerializeToString(&serializedData);
+
     std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
-    if (outputFile.is_open()) {
-        outputFile.write(serializedData.data(), serializedData.size());
+    if (!outputFile.is_open()) {
+        throw std::runtime_error("Failed to open file for writing: " + dbStoreFilePath);
+    }
+
+    outputFile.write(serializedData.data(), serializedData.size());
+    if (!outputFile.good()) {
+        throw std::runtime_error("Failed to write data to file: " + dbStoreFilePath);
     }
 }
 
