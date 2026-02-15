@@ -47,6 +47,9 @@ ValueTypeVariant KVDatabase::store(std::string &key, const ValueTypeVariant &val
 }
 
 ValueTypeVariant KVDatabase::get(std::string &key){
+    if (this->hashMap.find(key) == this->hashMap.end()) {
+        throw std::runtime_error("Key not found: " + key);
+    }
     std::string filePath = getFilePath(key);
     const auto [value, type] = this->hashMap[key];
     return value;
@@ -188,4 +191,16 @@ void KVDatabase::loadStoreFileIntoHashmap() {
 
     // Use helper method to deserialize all types including nested maps
     this->hashMap = loadNestedMap(kvMap);
+}
+
+void KVDatabase::deleteKey(const std::string& key) {
+    if (this->hashMap.find(key) == this->hashMap.end()) {
+        throw std::runtime_error("Cannot delete key: Key not found: " + key);
+    }
+    this->hashMap.erase(key);
+    saveToDisk();
+}
+
+const KVMap& KVDatabase::getAllEntries() const {
+    return this->hashMap;
 }
