@@ -58,6 +58,8 @@ public:
     ValueTypeVariant store(std::string &key, const ValueTypeVariant &value, std::string &type);
     ValueTypeVariant get(std::string &key);
     std::string getFilePath(std::string &key);
+    void deleteKey(const std::string& key);
+    const KVMap& getAllEntries() const;
 
     void saveToDisk();
     static keyvaluetypes::KeyValueMap* generateProtobufKVMap(const KVMap &hashMap);
