@@ -4,12 +4,14 @@
 
 #ifndef MY_KEY_VALUE_DB_TOKENTYPE_H
 #define MY_KEY_VALUE_DB_TOKENTYPE_H
+#include "vector"
 enum class TokenType {
     KEY,
-    COLON,
+    COLON = ':',
     STRING,
     BOOLEAN,
-    COMMA,
+    COMMA = ',',
+    EOL,
 };
 
 const std::vector<TokenType> VALUE_TYPES = {TokenType::STRING, TokenType::BOOLEAN};

@@ -15,6 +15,9 @@ add_executable(my_key_value_db
         #src/variants/ValueTypeVariant.h
         src/structs/ValueWithTypeObject.h
         src/Parsers/JSONParser/Enums/TokenType.h
+        src/Parsers/JSONParser/Structs/Token.h
+        src/Parsers/JSONParser/Tokenizer/JSONTokenizer.cpp
+        src/Parsers/JSONParser/Tokenizer/JSONTokenizer.h
 )
 
 
