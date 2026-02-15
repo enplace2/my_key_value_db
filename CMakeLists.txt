@@ -14,6 +14,10 @@ add_executable(my_key_value_db
         src/CLI/KVCli.h
         #src/variants/ValueTypeVariant.h
         src/structs/ValueWithTypeObject.h
+        src/utils/TypeConverter.cpp
+        src/utils/TypeConverter.h
+        src/CLI/CommandParser.cpp
+        src/CLI/CommandParser.h
 )
 
 

@@ -7,11 +7,17 @@
 
 
 #include "cxxopts.hpp"
+#include <iostream>
+
+class KVDatabase;
 
 class KVCli {
 private:
 public:
     static int handle(int argc, char* argv[]);
+    static void runInteractiveMode(KVDatabase& db,
+                                   std::istream& input = std::cin,
+                                   std::ostream& output = std::cout);
 
 };
 

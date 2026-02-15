@@ -6,6 +6,8 @@
 #include <iostream>
 #include "cxxopts.hpp"
 #include "../KVDatabase/KVDatabase.h"
+#include "CommandParser.h"
+#include "../utils/TypeConverter.h"
 
 cxxopts::Options options("kv-db", "CLI for key value db");
 
@@ -69,4 +71,95 @@ int KVCli::handle(int argc, char* argv[]) {
     }
 
     return 0;
+}
+
+void KVCli::runInteractiveMode(KVDatabase& db, std::istream& input, std::ostream& output) {
+    output << "KVDB CLI is running. Type 'help' for commands or 'exit' to quit." << std::endl;
+
+    std::string line;
+    while (true) {
+        output << "> ";
+        if (!std::getline(input, line)) {
+            break;
+        }
+
+        ParsedCommand cmd = CommandParser::parse(line);
+
+        if (!cmd.errorMsg.empty()) {
+            output << "Error: " << cmd.errorMsg << std::endl;
+            continue;
+        }
+
+        try {
+            switch (cmd.type) {
+                case CommandType::SET: {
+                    ValueTypeVariant convertedValue;
+                    if (cmd.valueType == "string") {
+                        convertedValue = cmd.value;
+                    } else if (cmd.valueType == "int") {
+                        convertedValue = TypeConverter::toInt64(cmd.value);
+                    } else if (cmd.valueType == "bool") {
+                        convertedValue = TypeConverter::toBool(cmd.value);
+                    } else if (cmd.valueType == "double") {
+                        convertedValue = TypeConverter::toDouble(cmd.value);
+                    } else if (cmd.valueType == "uint") {
+                        convertedValue = TypeConverter::toUInt64(cmd.value);
+                    } else {
+                        output << "Error: Unknown type: " << cmd.valueType << std::endl;
+                        break;
+                    }
+                    db.store(cmd.key, convertedValue, cmd.valueType);
+                    output << "Stored: " << cmd.key << " = " << cmd.value << " (" << cmd.valueType << ")" << std::endl;
+                    break;
+                }
+
+                case CommandType::GET: {
+                    ValueTypeVariant value = db.get(cmd.key);
+                    std::string valueStr = TypeConverter::variantToString(value);
+                    output << valueStr << std::endl;
+                    break;
+                }
+
+                case CommandType::DELETE: {
+                    db.deleteKey(cmd.key);
+                    output << "Deleted: " << cmd.key << std::endl;
+                    break;
+                }
+
+                case CommandType::LIST: {
+                    const KVMap& entries = db.getAllEntries();
+                    if (entries.empty()) {
+                        output << "No entries in database." << std::endl;
+                    } else {
+                        for (const auto& [key, valueObj] : entries) {
+                            std::string valueStr = TypeConverter::variantToString(valueObj.value);
+                            std::string typeName = TypeConverter::getTypeName(valueObj.value);
+                            output << key << ": " << valueStr << " (" << typeName << ")" << std::endl;
+                        }
+                    }
+                    break;
+                }
+
+                case CommandType::EXIT:
+                    output << "Exiting KVDB CLI." << std::endl;
+                    return;
+
+                case CommandType::HELP:
+                    output << "Available commands:" << std::endl;
+                    output << "  SET <key> <value> <type>  - Store a value (types: string, int, bool, double, uint)" << std::endl;
+                    output << "  GET <key>                 - Retrieve a value" << std::endl;
+                    output << "  DELETE <key>              - Remove a key" << std::endl;
+                    output << "  LIST                      - Show all entries" << std::endl;
+                    output << "  EXIT                      - Quit the CLI" << std::endl;
+                    output << "  HELP                      - Show this message" << std::endl;
+                    break;
+
+                case CommandType::INVALID:
+                    output << "Invalid command." << std::endl;
+                    break;
+            }
+        } catch (const std::exception& e) {
+            output << "Error: " << e.what() << std::endl;
+        }
+    }
 }
