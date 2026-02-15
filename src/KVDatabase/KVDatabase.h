@@ -22,6 +22,10 @@ private:
     std::string directoryPath;
     KVMap hashMap;
     std::string storeFilePath;
+
+    // Helper method for deserializing nested maps from Protocol Buffers
+    static KVMap loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap);
+
 public:
     KVDatabase(std::string &dbName);
     ~KVDatabase();

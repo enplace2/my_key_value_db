@@ -130,24 +130,12 @@ keyvaluetypes::Value* KVDatabase::serializeValue(const ValueTypeVariant &value, 
     return val;
 }
 
+// Recursively deserializes a Protocol Buffer KeyValueMap into a C++ KVMap
+// Handles all value types including nested maps
+KVMap KVDatabase::loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap) {
+    KVMap resultMap;
 
-void KVDatabase::loadStoreFileIntoHashmap() {
-    std::ifstream inputFile(this->storeFilePath, std::ios::binary);
-
-    if (!inputFile) {
-        throw std::runtime_error("Error opening file for reading.");
-    }
-
-    std::string serializedData((std::istreambuf_iterator<char>(inputFile)),
-                               std::istreambuf_iterator<char>());
-
-    keyvaluetypes::KeyValueMap kvMap;
-    if (!kvMap.ParseFromString(serializedData)) {
-        // Handle error: parsing failed
-        throw std::runtime_error("Error parsing file content.");
-    }
-
-    for (const auto& item : kvMap.items()) {
+    for (const auto& item : protoMap.items()) {
         const auto& key = item.key();
         const auto& val = item.value();
         ValueTypeVariant value;
@@ -168,8 +156,37 @@ void KVDatabase::loadStoreFileIntoHashmap() {
         } else if (val.has_uint_value()) {
             value = val.uint_value();
             type = "uint";
+        } else if (val.has_map()) {
+            // Recursive call for nested maps
+            value = loadNestedMap(val.map());
+            type = "map";
+        } else {
+            // Unknown type - log error and skip this entry
+            std::cerr << "Warning: Unknown value type for key '" << key << "'" << std::endl;
+            continue;
         }
 
-        this->hashMap[key] = {value, type};
+        resultMap[key] = {value, type};
     }
+
+    return resultMap;
+}
+
+void KVDatabase::loadStoreFileIntoHashmap() {
+    std::ifstream inputFile(this->storeFilePath, std::ios::binary);
+
+    if (!inputFile) {
+        throw std::runtime_error("Error opening file for reading.");
+    }
+
+    std::string serializedData((std::istreambuf_iterator<char>(inputFile)),
+                               std::istreambuf_iterator<char>());
+
+    keyvaluetypes::KeyValueMap kvMap;
+    if (!kvMap.ParseFromString(serializedData)) {
+        throw std::runtime_error("Error parsing file content.");
+    }
+
+    // Use helper method to deserialize all types including nested maps
+    this->hashMap = loadNestedMap(kvMap);
 }
