@@ -18,6 +18,10 @@ add_executable(Google_Tests_run test1.cpp
         ../src/CLI/KVCli.h
         ${PROTO_SRC}
         ${PROTO_HDR}
+        ../src/Parsers/JSONParser/Enums/TokenType.h
+        ../src/Parsers/JSONParser/Structs/Token.h
+        ../src/Parsers/JSONParser/Tokenizer/JSONTokenizer.cpp
+        ../src/Parsers/JSONParser/Tokenizer/JSONTokenizer.h
 )
 
 # Include the Google Test headers
