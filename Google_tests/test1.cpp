@@ -9,6 +9,59 @@
 
 namespace fs = std::filesystem;
 
+class NestedMapTest : public ::testing::Test {
+protected:
+    std::vector<std::string> testDatabases;
+
+    void TearDown() override {
+        for (const auto& dbName : testDatabases) {
+            std::string dbPath = FSManager::getDbPath(const_cast<std::string&>(dbName));
+            if (fs::exists(dbPath)) {
+                fs::remove_all(dbPath);
+            }
+        }
+    }
+
+    KVMap extractNestedMap(const KVMap& parentMap, const std::string& key) {
+        EXPECT_TRUE(parentMap.find(key) != parentMap.end());
+        return std::get<KVMap>(parentMap.at(key).value);
+    }
+
+    std::string extractString(const KVMap& map, const std::string& key) {
+        EXPECT_TRUE(map.find(key) != map.end());
+        return std::get<std::string>(map.at(key).value);
+    }
+
+    int64_t extractInt(const KVMap& map, const std::string& key) {
+        EXPECT_TRUE(map.find(key) != map.end());
+        return std::get<int64_t>(map.at(key).value);
+    }
+
+    KVMap storeAndRetrieve(KVDatabase& db, const std::string& keyParam, const KVMap& mapToStore) {
+        std::string key = keyParam;
+        std::string type = "map";
+        db.store(key, mapToStore, type);
+        ValueTypeVariant retrieved = db.get(key);
+        return std::get<KVMap>(retrieved);
+    }
+
+    KVMap storeReloadAndRetrieve(const std::string& dbNameParam, const std::string& keyParam, const KVMap& mapToStore) {
+        std::string dbName = dbNameParam;
+        std::string key = keyParam;
+        std::string type = "map";
+        testDatabases.push_back(dbName);
+        {
+            KVDatabase db = KVDatabase::createEmptyDb(dbName);
+            db.store(key, mapToStore, type);
+        }
+        KVDatabase reloadedDb = KVDatabase::load(dbName);
+        ValueTypeVariant retrieved = reloadedDb.get(key);
+        KVMap result = std::get<KVMap>(retrieved);
+        reloadedDb.destroy();
+        return result;
+    }
+};
+
 TEST(FSManagerTest, createBaseDirectory){
     /* Story
         * [Who] As a software engineer,
@@ -241,65 +294,29 @@ TEST(DBCoreTest, storeAndRetrieveValues){
 }
 
 
-TEST(DBCoreTest, StoreAndRetrieveNestedKVMaps) {
-    /** Story
-     * [Who] As a user,
-     * [What] I need to store and retrieve nested key-value maps
-     * [Value] So that complex data structures can be persisted and utilized.
-     */
-
-    /** Setup **/
+TEST_F(NestedMapTest, StoreAndRetrieveNestedKVMaps) {
     std::string dbName = "nested_kv_map_db";
     KVDatabase db = KVDatabase::createEmptyDb(dbName);
 
-    // Define nested KV map
     KVMap nestedMap;
     nestedMap["inner_string_key"] = {"inner_string_value", "string"};
     nestedMap["inner_int_key"] = {123, "int"};
     KVMap outerMap;
     outerMap["nested_map_key"] = {nestedMap, "map"};
 
-    // Store the nested KV map in the database
-    std::string mapKey = "outer_map_key";
-    std::string type = "map";
-    db.store(mapKey, outerMap, type);
+    auto retrievedMap = storeAndRetrieve(db, "outer_map_key", outerMap);
+    auto retrievedInnerMap = extractNestedMap(retrievedMap, "nested_map_key");
 
-    /** Test Retrieval **/
-    // Retrieve the stored nested KV map
-    ValueTypeVariant retrievedValueVariant = db.get(mapKey);
-    auto retrievedMap = std::get<KVMap>(retrievedValueVariant);
-
-    // Verify the nested structure
-    ASSERT_TRUE(retrievedMap.find("nested_map_key") != retrievedMap.end());
-    auto innerMapVariant = retrievedMap["nested_map_key"];
-    auto retrievedInnerMap = std::get<KVMap>(innerMapVariant.value);
-
-    // Verify contents of the inner map
-    ASSERT_TRUE(retrievedInnerMap.find("inner_string_key") != retrievedInnerMap.end());
-    auto retrievedStringValueVariant = retrievedInnerMap["inner_string_key"];
-    std::string retrievedStringValue = std::get<std::string>(retrievedStringValueVariant.value);
-    EXPECT_EQ(retrievedStringValue, "inner_string_value");
-
-    ASSERT_TRUE(retrievedInnerMap.find("inner_int_key") != retrievedInnerMap.end());
-    auto retrievedIntValueVariant = retrievedInnerMap["inner_int_key"];
-    int retrievedIntValue = std::get<int64_t>(retrievedIntValueVariant.value);
-    EXPECT_EQ(retrievedIntValue, 123);
+    EXPECT_EQ(extractString(retrievedInnerMap, "inner_string_key"), "inner_string_value");
+    EXPECT_EQ(extractInt(retrievedInnerMap, "inner_int_key"), 123);
 
     db.destroy();
 }
 
-TEST(DBCoreTest, StoreAndRetrieveDeeplyNestedKVMaps) {
-    /** Story
-     * [Who] As a user,
-     * [What] I need to store and retrieve deeply nested key-value maps
-     * [Value] So that very complex data structures can be persisted and utilized.
-     */
-
-    /** Setup **/
+TEST_F(NestedMapTest, StoreAndRetrieveDeeplyNestedKVMaps) {
     std::string dbName = "deeply_nested_kv_map_db";
     KVDatabase db = KVDatabase::createEmptyDb(dbName);
 
-    // Define deeply nested KV map
     KVMap innermostMap;
     innermostMap["deepest_string_key"] = {"deepest_string_value", "string"};
     innermostMap["deepest_int_key"] = {42, "int"};
@@ -307,42 +324,58 @@ TEST(DBCoreTest, StoreAndRetrieveDeeplyNestedKVMaps) {
     KVMap nestedMap;
     nestedMap["inner_string_key"] = {"inner_string_value", "string"};
     nestedMap["inner_int_key"] = {123, "int"};
-    nestedMap["inner_nested_map"] = {innermostMap, "map"}; // Third level of nesting
+    nestedMap["inner_nested_map"] = {innermostMap, "map"};
 
     KVMap outerMap;
     outerMap["nested_map_key"] = {nestedMap, "map"};
 
-    // Store the deeply nested KV map in the database
-    std::string mapKey = "outer_map_key";
-    std::string type = "map";
-    db.store(mapKey, outerMap, type);
+    auto retrievedMap = storeAndRetrieve(db, "outer_map_key", outerMap);
+    auto retrievedInnerMap = extractNestedMap(retrievedMap, "nested_map_key");
+    auto retrievedInnermostMap = extractNestedMap(retrievedInnerMap, "inner_nested_map");
 
-    /** Test Retrieval **/
-    // Retrieve the stored deeply nested KV map
-    ValueTypeVariant retrievedValueVariant = db.get(mapKey);
-    auto retrievedMap = std::get<KVMap>(retrievedValueVariant);
-
-    // Verify the nested structure
-    ASSERT_TRUE(retrievedMap.find("nested_map_key") != retrievedMap.end());
-    auto innerMapVariant = retrievedMap["nested_map_key"];
-    auto retrievedInnerMap = std::get<KVMap>(innerMapVariant.value);
-
-    // Verify contents of the nested map
-    ASSERT_TRUE(retrievedInnerMap.find("inner_nested_map") != retrievedInnerMap.end());
-    auto retrievedInnermostMapVariant = retrievedInnerMap["inner_nested_map"];
-    auto retrievedInnermostMap = std::get<KVMap>(retrievedInnermostMapVariant.value);
-
-    // Verify contents of the innermost map
-    ASSERT_TRUE(retrievedInnermostMap.find("deepest_string_key") != retrievedInnermostMap.end());
-    auto retrievedDeepestStringValueVariant = retrievedInnermostMap["deepest_string_key"];
-    std::string retrievedDeepestStringValue = std::get<std::string>(retrievedDeepestStringValueVariant.value);
-    EXPECT_EQ(retrievedDeepestStringValue, "deepest_string_value");
-
-    ASSERT_TRUE(retrievedInnermostMap.find("deepest_int_key") != retrievedInnermostMap.end());
-    auto retrievedDeepestIntValueVariant = retrievedInnermostMap["deepest_int_key"];
-    int64_t retrievedDeepestIntValue = std::get<int64_t>(retrievedDeepestIntValueVariant.value);
-    EXPECT_EQ(retrievedDeepestIntValue, 42);
+    EXPECT_EQ(extractString(retrievedInnermostMap, "deepest_string_key"), "deepest_string_value");
+    EXPECT_EQ(extractInt(retrievedInnermostMap, "deepest_int_key"), 42);
 
     db.destroy();
+}
+
+TEST_F(NestedMapTest, NestedMapPersistence) {
+    KVMap innerMap;
+    innerMap["inner_key_1"] = {"inner_value_1", "string"};
+    innerMap["inner_key_2"] = {999, "int"};
+
+    KVMap outerMap;
+    outerMap["nested"] = {innerMap, "map"};
+    outerMap["primitive"] = {"outer_string", "string"};
+
+    auto retrievedMap = storeReloadAndRetrieve("nested_persistence_test_db", "test_map", outerMap);
+    auto nestedMap = extractNestedMap(retrievedMap, "nested");
+
+    EXPECT_EQ(extractString(nestedMap, "inner_key_1"), "inner_value_1");
+    EXPECT_EQ(extractInt(nestedMap, "inner_key_2"), 999);
+    EXPECT_EQ(extractString(retrievedMap, "primitive"), "outer_string");
+}
+
+TEST_F(NestedMapTest, DeeplyNestedMapPersistence) {
+    KVMap innermostMap;
+    innermostMap["level_3_string"] = {"deepest_value", "string"};
+    innermostMap["level_3_int"] = {42, "int"};
+
+    KVMap middleMap;
+    middleMap["level_2_string"] = {"middle_value", "string"};
+    middleMap["level_2_nested"] = {innermostMap, "map"};
+
+    KVMap outerMap;
+    outerMap["level_1_string"] = {"outer_value", "string"};
+    outerMap["level_1_nested"] = {middleMap, "map"};
+
+    auto level1Map = storeReloadAndRetrieve("deeply_nested_persistence_db", "deep_map", outerMap);
+    auto level2Map = extractNestedMap(level1Map, "level_1_nested");
+    auto level3Map = extractNestedMap(level2Map, "level_2_nested");
+
+    EXPECT_EQ(extractString(level1Map, "level_1_string"), "outer_value");
+    EXPECT_EQ(extractString(level2Map, "level_2_string"), "middle_value");
+    EXPECT_EQ(extractString(level3Map, "level_3_string"), "deepest_value");
+    EXPECT_EQ(extractInt(level3Map, "level_3_int"), 42);
 }
 

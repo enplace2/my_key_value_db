@@ -22,6 +22,16 @@ private:
     std::string directoryPath;
     KVMap hashMap;
     std::string storeFilePath;
+
+    /**
+     * Recursively deserializes Protocol Buffer KeyValueMap into C++ KVMap.
+     * @param protoMap The Protocol Buffer map to deserialize
+     * @param depth Current recursion depth (used to prevent stack overflow)
+     * @return Deserialized KVMap with all nested structures
+     * @throws std::runtime_error if max nesting depth exceeded or unknown type encountered
+     */
+    static KVMap loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap, int depth = 0);
+
 public:
     KVDatabase(std::string &dbName);
     ~KVDatabase();

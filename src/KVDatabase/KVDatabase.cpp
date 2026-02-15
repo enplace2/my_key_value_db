@@ -63,24 +63,23 @@ KVDatabase KVDatabase::load(std::string &dbName) {
 
 
 void KVDatabase::saveToDisk() {
-    // Get the file path to save to.
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(this->name);
-    // If a store file already exists, version it by appending a timestamp.
     FSManager::appendTimeStampToFileName(dbStoreFilePath);
 
-    // Use the modified generateProtobufKVMap to get a pointer to the map.
-    keyvaluetypes::KeyValueMap* kvMap = generateProtobufKVMap(this->hashMap);
+    std::unique_ptr<keyvaluetypes::KeyValueMap> kvMap(generateProtobufKVMap(this->hashMap));
 
-    // Write the serialized data to a file at dbStoreFilePath.
     std::string serializedData;
     kvMap->SerializeToString(&serializedData);
+
     std::ofstream outputFile(dbStoreFilePath, std::ios::binary);
-    if (outputFile.is_open()) {
-        outputFile.write(serializedData.data(), serializedData.size());
+    if (!outputFile.is_open()) {
+        throw std::runtime_error("Failed to open file for writing: " + dbStoreFilePath);
     }
 
-    // Free memory
-    delete kvMap;
+    outputFile.write(serializedData.data(), serializedData.size());
+    if (!outputFile.good()) {
+        throw std::runtime_error("Failed to write data to file: " + dbStoreFilePath);
+    }
 }
 
 
@@ -130,24 +129,15 @@ keyvaluetypes::Value* KVDatabase::serializeValue(const ValueTypeVariant &value, 
     return val;
 }
 
-
-void KVDatabase::loadStoreFileIntoHashmap() {
-    std::ifstream inputFile(this->storeFilePath, std::ios::binary);
-
-    if (!inputFile) {
-        throw std::runtime_error("Error opening file for reading.");
+KVMap KVDatabase::loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap, int depth) {
+    const int MAX_DEPTH = 100;
+    if (depth > MAX_DEPTH) {
+        throw std::runtime_error("Maximum nesting depth exceeded (limit: " + std::to_string(MAX_DEPTH) + ")");
     }
 
-    std::string serializedData((std::istreambuf_iterator<char>(inputFile)),
-                               std::istreambuf_iterator<char>());
+    KVMap resultMap;
 
-    keyvaluetypes::KeyValueMap kvMap;
-    if (!kvMap.ParseFromString(serializedData)) {
-        // Handle error: parsing failed
-        throw std::runtime_error("Error parsing file content.");
-    }
-
-    for (const auto& item : kvMap.items()) {
+    for (const auto& item : protoMap.items()) {
         const auto& key = item.key();
         const auto& val = item.value();
         ValueTypeVariant value;
@@ -168,8 +158,34 @@ void KVDatabase::loadStoreFileIntoHashmap() {
         } else if (val.has_uint_value()) {
             value = val.uint_value();
             type = "uint";
+        } else if (val.has_map()) {
+            value = loadNestedMap(val.map(), depth + 1);
+            type = "map";
+        } else {
+            throw std::runtime_error("Unknown value type for key '" + key + "'");
         }
 
-        this->hashMap[key] = {value, type};
+        resultMap[key] = {value, type};
     }
+
+    return resultMap;
+}
+
+void KVDatabase::loadStoreFileIntoHashmap() {
+    std::ifstream inputFile(this->storeFilePath, std::ios::binary);
+
+    if (!inputFile) {
+        throw std::runtime_error("Error opening file for reading.");
+    }
+
+    std::string serializedData((std::istreambuf_iterator<char>(inputFile)),
+                               std::istreambuf_iterator<char>());
+
+    keyvaluetypes::KeyValueMap kvMap;
+    if (!kvMap.ParseFromString(serializedData)) {
+        throw std::runtime_error("Error parsing file content.");
+    }
+
+    // Use helper method to deserialize all types including nested maps
+    this->hashMap = loadNestedMap(kvMap);
 }
