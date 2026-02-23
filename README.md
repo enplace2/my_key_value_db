@@ -1,6 +1,6 @@
 # my_key_value_db
 
-A simple key-value database built in C++17. This is a learning project focused on writing modern C++, working with Protocol Buffers for binary serialization, and building a persistent storage engine from scratch.
+A simple key-value database built in C++17. This is a small practice project focused on writing modern C++, working with Protocol Buffers for binary serialization, and building a persistent storage engine from scratch.
 
 ## What It Does
 
