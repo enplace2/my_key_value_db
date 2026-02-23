@@ -14,23 +14,25 @@ private:
 
 public:
     static std::string getHomeDir() {
-        char* homeDir;
+        const char* homeDir;
 #ifdef _WIN32
         homeDir = getenv("USERPROFILE");
 #else
         homeDir = getenv("HOME");
 #endif
-
+        if (homeDir == nullptr) {
+            throw std::runtime_error("HOME environment variable not set");
+        }
         return std::string(homeDir);
     }
     inline static const std::string baseDir = getHomeDir() + "/.kv_db";
     static bool createBaseDirectory();
-    static std::string createDbDirectory(std::string &dbName);
-    static std::string createDbStoreFile(std::string &dbName);
-    static std::ofstream openDBWriteStream(std::string &filePath);
-    static std::string readFileContents(std::string &filePath);
-    static std::string getDbPath(std::string &dbName);
-    static std::string getDbStoreFilePath(std::string &dbName);
+    static std::string createDbDirectory(const std::string &dbName);
+    static std::string createDbStoreFile(const std::string &dbName);
+    static std::ofstream openDBWriteStream(const std::string &filePath);
+    static std::string readFileContents(const std::string &filePath);
+    static std::string getDbPath(const std::string &dbName);
+    static std::string getDbStoreFilePath(const std::string &dbName);
     static void appendTimeStampToFileName(std::string &originalPath);
 };
 

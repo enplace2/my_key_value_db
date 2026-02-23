@@ -15,7 +15,7 @@ bool FSManager::createBaseDirectory() {
     return fs::exists(FSManager::baseDir);
 }
 
-std::string FSManager::createDbDirectory(std::string &dbName) {
+std::string FSManager::createDbDirectory(const std::string &dbName) {
     std::string dbDirectoryPath = getDbPath(dbName);
 
     if(!fs::exists(dbDirectoryPath)){
@@ -26,7 +26,7 @@ std::string FSManager::createDbDirectory(std::string &dbName) {
     return dbDirectoryPath;
 }
 
-std::string FSManager::createDbStoreFile(std::string &dbName) {
+std::string FSManager::createDbStoreFile(const std::string &dbName) {
     std::string dbStoreFilePath = getDbStoreFilePath(dbName);
 
     // Open and immediately close an ofstream with the path.
@@ -42,13 +42,13 @@ std::string FSManager::createDbStoreFile(std::string &dbName) {
 }
 
 
-std::ofstream FSManager::openDBWriteStream(std::string &filePath) {
+std::ofstream FSManager::openDBWriteStream(const std::string &filePath) {
     std::ofstream os;
     os.open(filePath);
     return os;
 }
 
-std::string FSManager::readFileContents(std::string &filePath) {
+std::string FSManager::readFileContents(const std::string &filePath) {
     std::ifstream is(filePath);
     if(is){
         std::string content((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
@@ -57,12 +57,12 @@ std::string FSManager::readFileContents(std::string &filePath) {
     return "";
 }
 
-std::string FSManager::getDbPath(std::string &dbName) {
+std::string FSManager::getDbPath(const std::string &dbName) {
     std::string dbDirectoryPath = FSManager::baseDir + "/" +dbName;
     return dbDirectoryPath;
 }
 
-std::string FSManager::getDbStoreFilePath(std::string &dbName) {
+std::string FSManager::getDbStoreFilePath(const std::string &dbName) {
     std::string dbStoreFilePath = getDbPath(dbName) + "/" +"store.kv";
     return dbStoreFilePath;
 }
