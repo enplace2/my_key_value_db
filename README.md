@@ -55,6 +55,7 @@ Data is stored at `~/.kv_db/default/store.kv`.
 
 ## TODOs
 
+- [ ] Page-based storage with B-tree indexing to avoid rewriting the entire database on every write
 - [ ] Write-ahead log (WAL) for crash recovery instead of full serialization on every write
 - [ ] Batch write support to reduce disk I/O
 - [ ] Nested map support in CLI (e.g. JSON input)
