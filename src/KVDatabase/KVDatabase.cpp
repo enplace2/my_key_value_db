@@ -12,7 +12,7 @@
 
 namespace fs = std::filesystem;
 
-KVDatabase::KVDatabase(std::string &dbName) {
+KVDatabase::KVDatabase(const std::string &dbName) {
     std::string dbDirectoryPath = FSManager::getDbPath(dbName);
     std::string dbStoreFilePath = FSManager::getDbStoreFilePath(dbName);
     this->name = dbName;
@@ -26,7 +26,7 @@ KVDatabase::~KVDatabase()  = default;
 std::string KVDatabase::getDirectory() {
     return this->directoryPath;
 }
-KVDatabase KVDatabase:: createEmptyDb(std::string &dbName) {
+KVDatabase KVDatabase:: createEmptyDb(const std::string &dbName) {
     std::string directoryPath = FSManager::createDbDirectory(dbName);
     std::string dbStoreFile = FSManager::createDbStoreFile(dbName);
     return KVDatabase(dbName);
@@ -38,7 +38,7 @@ void KVDatabase::destroy() {
     }
 }
 
-ValueTypeVariant KVDatabase::store(std::string &key, const ValueTypeVariant &value, std::string &type) {
+ValueTypeVariant KVDatabase::store(const std::string &key, const ValueTypeVariant &value, const std::string &type) {
     this->hashMap[key] = {value, type};
     auto& valueWithTypeInfo = this->hashMap[key];
     auto& savedValue = valueWithTypeInfo.value;
@@ -46,17 +46,20 @@ ValueTypeVariant KVDatabase::store(std::string &key, const ValueTypeVariant &val
     return savedValue;
 }
 
-ValueTypeVariant KVDatabase::get(std::string &key){
+ValueTypeVariant KVDatabase::get(const std::string &key){
+    if (this->hashMap.find(key) == this->hashMap.end()) {
+        throw std::runtime_error("Key not found: " + key);
+    }
     std::string filePath = getFilePath(key);
     const auto [value, type] = this->hashMap[key];
     return value;
 }
 
-std::string KVDatabase::getFilePath(std::string &key) {
+std::string KVDatabase::getFilePath(const std::string &key) {
     return this->directoryPath + "/" + key + "_string.kv";
 }
 
-KVDatabase KVDatabase::load(std::string &dbName) {
+KVDatabase KVDatabase::load(const std::string &dbName) {
     std::string dbDirectoryPath = FSManager::getDbPath(dbName);
     return KVDatabase(dbName);
 }
@@ -188,4 +191,16 @@ void KVDatabase::loadStoreFileIntoHashmap() {
 
     // Use helper method to deserialize all types including nested maps
     this->hashMap = loadNestedMap(kvMap);
+}
+
+void KVDatabase::deleteKey(const std::string& key) {
+    if (this->hashMap.find(key) == this->hashMap.end()) {
+        throw std::runtime_error("Cannot delete key: Key not found: " + key);
+    }
+    this->hashMap.erase(key);
+    saveToDisk();
+}
+
+const KVMap& KVDatabase::getAllEntries() const {
+    return this->hashMap;
 }

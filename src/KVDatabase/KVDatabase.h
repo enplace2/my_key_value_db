@@ -33,7 +33,7 @@ private:
     static KVMap loadNestedMap(const keyvaluetypes::KeyValueMap& protoMap, int depth = 0);
 
 public:
-    KVDatabase(std::string &dbName);
+    KVDatabase(const std::string &dbName);
     ~KVDatabase();
 
     /*-----------------------------------------
@@ -49,15 +49,17 @@ public:
     /*-----------------------------------------
      * DB METHODS
      * ---------------------------------------*/
-    static KVDatabase createEmptyDb(std::string& dbName);
+    static KVDatabase createEmptyDb(const std::string& dbName);
     void destroy();
-    static KVDatabase load(std::string &dbName);
+    static KVDatabase load(const std::string &dbName);
     void loadStoreFileIntoHashmap();
 
 
-    ValueTypeVariant store(std::string &key, const ValueTypeVariant &value, std::string &type);
-    ValueTypeVariant get(std::string &key);
-    std::string getFilePath(std::string &key);
+    ValueTypeVariant store(const std::string &key, const ValueTypeVariant &value, const std::string &type);
+    ValueTypeVariant get(const std::string &key);
+    std::string getFilePath(const std::string &key);
+    void deleteKey(const std::string& key);
+    const KVMap& getAllEntries() const;
 
     void saveToDisk();
     static keyvaluetypes::KeyValueMap* generateProtobufKVMap(const KVMap &hashMap);
